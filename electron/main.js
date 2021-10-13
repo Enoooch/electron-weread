@@ -25,10 +25,7 @@ const createWindow = () => {
     minWidth: 375,
     minHeight: 667,
     backgroundColor: '#000',
-    // darkTheme: true,
-    // titleBarStyle: 'hidden',
-    // frame: false,
-    // show: true,
+    frame: false,
     webPreferences: {
       // preload: path.join(__dirname, 'preload.js'),
       webviewTag: true,
