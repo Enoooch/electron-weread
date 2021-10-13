@@ -1,13 +1,38 @@
 <template>
-<webview id="webview" src="https://weread.qq.com/"></webview>
+  <webview id="webview" ref="webview" src="https://weread.qq.com/"></webview>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted, ref, Ref } from 'vue'
 
 export default defineComponent({
   name: 'App',
-  components: {}
+  setup() {
+    const webview: Ref = ref(null)
+
+    onMounted(() => {
+      webview.value.addEventListener('dom-ready', () => {
+        webview.value.insertCSS(`
+          ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+          }
+          ::-webkit-scrollbar-track {
+            background-color: #11171a;
+            border-radius: 10px;
+          }
+          ::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+          }
+        `)
+      })
+    })
+
+    return {
+      webview,
+    }
+  },
 })
 </script>
 
@@ -17,7 +42,10 @@ export default defineComponent({
   padding: 0;
   box-sizing: border-box;
 }
-html, body, #app, #webview{
+html,
+body,
+#app,
+#webview {
   width: 100%;
   height: 100%;
 }
