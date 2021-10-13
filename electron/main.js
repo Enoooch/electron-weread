@@ -1,4 +1,4 @@
-const { app, BrowserView, BrowserWindow } = require('electron')
+const { app, BrowserWindow } = require('electron')
 const path = require('path')
 const Store = require('electron-store')
 
@@ -19,7 +19,7 @@ const createWindow = () => {
     windowHeight = windowSize.height
   }
 
-  const mainWindow = new BrowserWindow({
+  const win = new BrowserWindow({
     width: windowWidth,
     height: windowHeight,
     minWidth: 375,
@@ -33,25 +33,34 @@ const createWindow = () => {
     },
   })
 
-  mainWindow.loadURL(
+  win.loadURL(
     isDev
       ? 'http://localhost:3000'
       : `file://${path.join(__dirname, '../dist/index.html')}`
   )
-
-  // Open the DevTools.
-  isDev && mainWindow.openDevTools()
-
-  mainWindow.on('will-resize', (event, newBounds) => {
+  win.on('will-resize', (event, newBounds) => {
     store.set('window-size', {
       width: newBounds.width,
       height: newBounds.height,
     })
   })
+  win.on('close', (event) => {
+    if (!isAppQuitting) {
+      event.preventDefault()
+      win.hide()
+    }
+  })
+  // Open the DevTools.
+  isDev && win.openDevTools()
 }
 
 app.on('ready', () => {
   createWindow()
+})
+
+let isAppQuitting = false
+app.on('before-quit', () => {
+  isAppQuitting = true
 })
 
 app.on('window-all-closed', () => {
@@ -61,7 +70,12 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
+  const allWindows = BrowserWindow.getAllWindows()
+  if (allWindows.length === 0) {
     createWindow()
+  } else {
+    allWindows.forEach(win => {
+      win.show()
+    })
   }
 })
