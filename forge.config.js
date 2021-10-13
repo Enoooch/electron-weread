@@ -1,17 +1,20 @@
 const path = require('path')
 
+/**
+ * Please note that you can not override the dir, arch, platform, out
+ * or electronVersionoptions as they are set by Electron Forge internally
+ */
 module.exports = {
   packagerConfig: {
-    name: 'weread',
-    arch: 'x64',
-    // arch: 'ia32',
-    asar: false,
-    dir: path.join(__dirname, '../'),
-    icon: path.join(__dirname, '../build/icons/icon'),
+    name: 'electron-weread',
+    asar: true,
+    icon: path.join(__dirname, './public/icons/icon'),
     ignore: /(^\/(src|test|\.[a-z]+|README|yarn|static|vite|\/web))|\.gitkeep|config/,
-    out: path.join(__dirname, '../build'),
     overwrite: true,
-    platform: process.env.BUILD_TARGET || 'all',
+    // arch: 'x64',
+    // dir: path.join(__dirname, '../'),
+    // out: path.join(__dirname, '../build'),
+    // platform: process.env.BUILD_TARGET || 'all',
   },
   makers: [
     {
