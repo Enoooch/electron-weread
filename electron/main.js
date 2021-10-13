@@ -51,17 +51,6 @@ const createWindow = () => {
       height: newBounds.height,
     })
   })
-
-  // createBrowerView(mainWindow)
-}
-
-const createBrowerView = win => {
-  const { width, height } = win.getBounds()
-  const view = new BrowserView()
-  win.setBrowserView(view)
-  view.setBounds({ x: 0, y: 200, width, height })
-  view.setAutoResize({})
-  view.webContents.loadURL('https://weread.qq.com/')
 }
 
 app.on('ready', () => {
