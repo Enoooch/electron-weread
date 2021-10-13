@@ -1,5 +1,6 @@
 <template>
   <webview id="webview" ref="webview" src="https://weread.qq.com/"></webview>
+  <section class="draggable-region"></section>
 </template>
 
 <script lang="ts">
@@ -55,5 +56,16 @@ body,
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+}
+section {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.draggable-region {
+  width: 100%;
+  height: 20px;
+  user-select: none;
+  -webkit-app-region: drag;
 }
 </style>
