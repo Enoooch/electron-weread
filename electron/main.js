@@ -1,6 +1,8 @@
 const { app, BrowserView, BrowserWindow } = require('electron')
 const path = require('path')
+const Store = require('electron-store')
 
+const store = new Store()
 const isDev = process.env.IS_DEV == 'true' ? true : false
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -9,9 +11,17 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 }
 
 const createWindow = () => {
+  let windowWidth = 1000
+  let windowHeight = 750
+  const windowSize = store.get('window-size')
+  if (windowSize) {
+    windowWidth = windowSize.width
+    windowHeight = windowSize.height
+  }
+
   const mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 750,
+    width: windowWidth,
+    height: windowHeight,
     minWidth: 375,
     minHeight: 667,
     backgroundColor: '#000',
@@ -26,8 +36,6 @@ const createWindow = () => {
     },
   })
 
-  // and load the index.html of the app.
-  // mainWindow.loadFile(path.join(__dirname, 'index.html'))
   mainWindow.loadURL(
     isDev
       ? 'http://localhost:3000'
@@ -36,6 +44,13 @@ const createWindow = () => {
 
   // Open the DevTools.
   isDev && mainWindow.openDevTools()
+
+  mainWindow.on('will-resize', (event, newBounds) => {
+    store.set('window-size', {
+      width: newBounds.width,
+      height: newBounds.height,
+    })
+  })
 
   // createBrowerView(mainWindow)
 }
@@ -49,16 +64,10 @@ const createBrowerView = win => {
   view.webContents.loadURL('https://weread.qq.com/')
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.on('ready', () => {
   createWindow()
 })
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
@@ -66,12 +75,7 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
   }
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
