@@ -1,8 +1,7 @@
 const { app, BrowserWindow } = require('electron')
 const path = require('path')
-const Store = require('electron-store')
+const windowStateKeeper = require('electron-window-state')
 
-const store = new Store()
 const isDev = process.env.IS_DEV == 'true' ? true : false
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -11,23 +10,21 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 }
 
 const createWindow = () => {
-  let windowWidth = 1000
-  let windowHeight = 750
-  const windowSize = store.get('window-size')
-  if (windowSize) {
-    windowWidth = windowSize.width
-    windowHeight = windowSize.height
-  }
+  let mainWindowState = windowStateKeeper({
+    defaultWidth: 1000,
+    defaultHeight: 750,
+  })
 
   const win = new BrowserWindow({
-    width: windowWidth,
-    height: windowHeight,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
     minWidth: 375,
     minHeight: 667,
     backgroundColor: '#000',
     frame: false,
     webPreferences: {
-      // preload: path.join(__dirname, 'preload.js'),
       webviewTag: true,
       nodeIntegration: true,
     },
@@ -38,18 +35,15 @@ const createWindow = () => {
       ? 'http://localhost:3000'
       : `file://${path.join(__dirname, '../dist/index.html')}`
   )
-  win.on('will-resize', (event, newBounds) => {
-    store.set('window-size', {
-      width: newBounds.width,
-      height: newBounds.height,
-    })
-  })
   win.on('close', (event) => {
     if (!isAppQuitting) {
       event.preventDefault()
       win.hide()
     }
   })
+
+  mainWindowState.manage(win)
+
   // Open the DevTools.
   isDev && win.openDevTools()
 }
