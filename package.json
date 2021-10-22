@@ -1,7 +1,7 @@
 {
   "name": "electron-weread",
   "productName": "electron-weread",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A weread wrapper with electron",
   "main": "electron/main.js",
   "scripts": {
