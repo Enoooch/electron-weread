@@ -7,4 +7,4 @@ A weread wrapper with electron
 - [x] frameless
 - [x] custom scrollbar
 - [x] store and restore window state
-- [ ] window settings
+- [x] window settings
