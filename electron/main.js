@@ -1,12 +1,23 @@
 const { app, BrowserWindow } = require('electron')
 const path = require('path')
 const windowStateKeeper = require('electron-window-state')
-
+const { spawn } = require('child_process')
 const isDev = process.env.IS_DEV == 'true' ? true : false
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
+if (require('electron-squirrel-startup')) {
+  // eslint-disable-line global-require
   app.quit()
+}
+
+const addMainWatcher = () => {
+  if (isDev) {
+    const chokidar = require('chokidar')
+    chokidar.watch('./electron/', { persistent: true }).on('change', (event, path) => {
+      app.quit()
+      spawn('yarn', ['electron'], { stdio: 'inherit' })
+    })
+  }
 }
 
 const createWindow = () => {
@@ -30,16 +41,16 @@ const createWindow = () => {
     },
   })
 
-  win.loadURL(
-    isDev
-      ? 'http://localhost:3000'
-      : `file://${path.join(__dirname, '../dist/index.html')}`
-  )
+  win.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../dist/index.html')}`)
   win.on('close', (event) => {
     if (!isAppQuitting) {
       event.preventDefault()
       win.hide()
     }
+  })
+
+  win.once('ready-to-show', () => {
+    addMainWatcher()
   })
 
   mainWindowState.manage(win)
@@ -68,7 +79,7 @@ app.on('activate', () => {
   if (allWindows.length === 0) {
     createWindow()
   } else {
-    allWindows.forEach(win => {
+    allWindows.forEach((win) => {
       win.show()
     })
   }
